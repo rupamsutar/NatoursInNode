@@ -1,0 +1,25 @@
+{
+  "name": "natours_in_node",
+  "version": "1.0.0",
+  "description": "learning nodeJS and MongoDB",
+  "main": "app.js",
+  "scripts": {
+    "start": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rupamsutar/NatoursInNode.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rupamsutar/NatoursInNode/issues"
+  },
+  "homepage": "https://github.com/rupamsutar/NatoursInNode#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  }
+}
