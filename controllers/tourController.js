@@ -49,32 +49,39 @@ exports.createTour = async (req, res) => {
   }
 };
 
-exports.updateTour = (req, res) => {
-  //   if (req.params.id * 1 > tours.length) {
-  //     return res.status(404).json({
-  //       status: 'fail',
-  //       message: 'Invalid ID',
-  //     });
-  //   }
+exports.updateTour = async(req, res) => {
+  try {
+    const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true
+    })
 
-  res.status(200).json({
-    status: 'success',
-    data: {
-      tour: 'UPDATED TOUR HERE !',
-    },
-  });
+    res.status(200).json({
+      status: 'success',
+      data: {
+        tour
+      }
+    })
+  } catch (error) {
+    res.status(400).json({
+      status: "fail",
+      message: "Invalid Data Sent"
+    })
+  }
 };
 
-exports.deleteTour = (req, res) => {
-  //   if (req.params.id * 1 > tours.length) {
-  //     return res.status(404).json({
-  //       status: 'fail',
-  //       message: 'Invalid ID',
-  //     });
-  //   }
+exports.deleteTour = async(req, res) => {
+  try {
+    await Tour.findByIdAndDelete(req.params.id);
 
-  res.status(204).json({
-    status: 'success',
-    data: isNull,
-  });
+    res.status(204).json({
+      status: 'success',
+      data: "null"
+    })
+  } catch (error) {
+    res.status(400).json({
+      status: 'fail',
+      message: error
+    })
+  }
 };
