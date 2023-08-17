@@ -1,123 +1,42 @@
-// const express = require('express');
-// const fs = require("fs");
-// const app = express();
-// // app.use(express.json());
-
-// const port = 8000;
-// const tours = JSON.parse(fs.readFileSync(`${__dirname}/dev-data/data/tours.json`));
-
-// // app.get("/", (req, res) => {
-// //     res.json({message: "hello from the server side", statusCode: 200});
-// // })
-
-// // app.post("/", (req, res) => {
-// //     res.send("Posting the data")
-// // })
-
-// app.get("/api/v1/tours", (req, res) => {
-//     res.status(200).json({
-//         status: "success",
-//         results: tours.length,
-//         data: {
-//             tours: tours
-//         }
-//     })
-// });
-
-// app.post("/api/v1/tours", (req,res) => {
-//     console.log(req.body);
-//     res.send("Done");
-// });
-
-// app.listen(port, () => {
-//     console.log(`app is running on port ${port}...`);
-// })
-
-const fs = require('fs');
 const express = require('express');
+const morgan = require('morgan');
 const app = express();
 
-//adding middleware
+const tourRouter = require('./routes/tourRoutes');
+const userRouter = require('./routes/userRoutes');
+
+// MIDDLEWARES
+if(process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev'));
+}
+
 app.use(express.json());
+app.use(express.static(`${__dirname}/public`));
 app.use((req, res, next) => {
-  console.log('Hello from the middleware 👋');
+  console.log('Hello from the Middleware :)');
   next();
 });
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
-  console.log(req.requestTime);
   next();
 });
 
-const port = 8000;
-
-const tours = JSON.parse(
-  fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
-);
-
-const getLandingPage = (req, res) => {
+// HOME ROUTES
+app.get('/', (req, res) => {
   res
     .status(200)
-    .json({ message: 'Get req accepted on the landing page.', status: 200 });
-};
-
-const getTours = (req, res) => {
-  res.status(200).json({
-    status: 'Success',
-    requestedAt: req.requestTime,
-    result: tours.length,
-    data: {
-      tours,
-    },
-  });
-};
-
-const createTour = (req, res) => {
-  const newId = tours[tours.length - 1].id + 1;
-  const newTour = {
-    id: newId,
-    ...req.body,
-  };
-
-  tours.push(newTour);
-
-  fs.writeFile(
-    `${__dirname}/dev-data/data/tours-simple.json`,
-    JSON.stringify(tours),
-    (err) => {
-      res.status(201).json({
-        status: 'success',
-        data: {
-          tour: newTour,
-        },
-      });
-    }
-  );
-};
-
-const getATour = (req, res) => {
-  console.log(req.params);
-
-  const tour = tours.find((el) => el.id === +req.params.id);
-  if (!tour) {
-    return res.status(404).json({
-      status: 'Fail',
-      message: 'Invalid ID',
-    });
-  }
-
-  res.status(200).json({
-    status: 'success',
-    data: {
-      tour,
-    },
-  });
-};
-app.get('/', getLandingPage);
-app.get('/api/v1/tours', getTours);
-app.post('/api/v1/tours', createTour);
-app.get('/api/v1/tours/:id', getATour);
-
-app.listen(port, () => {
-  console.log(`App is listening on port ${port}`);
+    .json({ message: 'Hello from the server side !', app: 'Natours' });
 });
+
+app.post('/', (req, res) => {
+  res
+    .status(404)
+    .json({
+      message: 'You can send post req to this server !',
+      app: 'Natours',
+    });
+});
+app.use('/api/v1/tours', tourRouter);
+app.use('/api/v1/users', userRouter);
+
+module.exports = app;
