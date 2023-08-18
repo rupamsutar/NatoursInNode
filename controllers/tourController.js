@@ -2,20 +2,46 @@ const fs = require('fs');
 
 const Tour = require('./../models/tourModel');
 
+exports.aliasTopTours = (req, res, next) => {
+  req.query.limit = '5';
+  req.query.sort = '-ratingsAverage,price';
+  req.query.fields = 'name,price,ratingsAverage,summary,difficulty';
+  next();
+}
+
+class APIFeatures {
+  constructor(query, queryString) {
+    this.query = query;
+    this.queryString = queryString
+  }
+
+  filter() {
+    const queryObj = {...this.queryString}
+    const excludedFields = ["page", 'sort', 'limit', 'fields'];
+    excludedFields.forEach((el) => delete queryObj[el]);
+  
+    // 1B) Advanced Filtering
+    let queryStr = JSON.stringify(queryObj);
+    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/, match => `$${match}`)
+  
+    this.query.find(JSON.parse(queryStr));
+  }
+}
+
 exports.getAllTours = async (req, res) => {
   console.log(req.query);
 
   try {
-     // 1A) Filtering
-  const queryObj = {...req.query}
-  const excludedFields = ["page", 'sort', 'limit', 'fields'];
-  excludedFields.forEach((el) => delete queryObj[el]);
+  //    // 1A) Filtering
+  // const queryObj = {...req.query}
+  // const excludedFields = ["page", 'sort', 'limit', 'fields'];
+  // excludedFields.forEach((el) => delete queryObj[el]);
 
-  // 1B) Advanced Filtering
-  let queryStr = JSON.stringify(queryObj);
-  queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/, match => `$${match}`)
+  // // 1B) Advanced Filtering
+  // let queryStr = JSON.stringify(queryObj);
+  // queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/, match => `$${match}`)
 
-  let query =  Tour.find(JSON.parse(queryStr));
+  // let query =  Tour.find(JSON.parse(queryStr));
 
   
 
@@ -42,6 +68,8 @@ exports.getAllTours = async (req, res) => {
     const numTours = await Tour.countDocuments();
     if (skip >= numTours) throw new Error("This page does not exist");
   }
+
+  const 
 
   query = query.skip(skip).limit(limit);
   // const tours = await Tour.find().where("duration").equals(5).where("difficulty").equals("easy")
