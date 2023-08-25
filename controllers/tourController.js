@@ -53,7 +53,11 @@ exports.getTour = async (req, res) => {
   }
 };
 
-exports.createTour = async (req, res) => {
+const createAsync = fn => {
+  fn(req, res,next).catch((err) => next(err));
+}
+
+exports.createTour = createAsync(async (req, res,next) => {
   try {
     // const newTour = Object.assign({ id: newID }, req.body);
     const newTour = await Tour.create(req.body);
@@ -70,7 +74,7 @@ exports.createTour = async (req, res) => {
       message: error.message,
     });
   }
-};
+});
 
 exports.updateTour = async (req, res) => {
   try {
