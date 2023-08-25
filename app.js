@@ -40,4 +40,11 @@ app.post('/', (req, res) => {
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 
+app.all('*', function(req, res, next) {
+  res.status(404).json({
+    status: 'failed',
+    message: `Can't find ${req.originalUrl} on this server !`
+  })
+})
+
 module.exports = app;
