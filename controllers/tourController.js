@@ -12,8 +12,6 @@ exports.aliasTopTours = (req, res, next) => {
 
 
 exports.getAllTours = async (req, res) => {
-  console.log(req.query);
-
   try {
 
     const features = new APIFeatures(Tour.find(), req.query)
@@ -69,7 +67,7 @@ exports.createTour = async (req, res) => {
   } catch (error) {
     res.status(400).json({
       status: 'fail',
-      message: 'Invalid Data Sent',
+      message: error.message,
     });
   }
 };
@@ -90,7 +88,7 @@ exports.updateTour = async (req, res) => {
   } catch (error) {
     res.status(400).json({
       status: 'fail',
-      message: 'Invalid Data Sent',
+      message: error.message
     });
   }
 };
@@ -194,6 +192,11 @@ exports.getMonthlyPlan = async(req, res) => {
       },
       {
         $limit: 12
+      },
+      {
+        $sort: {
+          month: -1
+        }
       }
     ])
 
