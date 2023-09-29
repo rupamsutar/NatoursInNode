@@ -17,6 +17,7 @@ exports.signup = catchAsync(async(req, res, next) => {
         password: req.body.password,
         passwordConfirm: req.body.passwordConfirm,
         passwordChangedAt: req.body.passwordChangedAt,
+        role: req.body.role
     });
 
     const token = signToken(newUser._id);
@@ -81,4 +82,37 @@ exports.protect = catchAsync( async(req, res, next) => {
     // Grant Access to protected route !
     req.user = freshUser;
     next();
+});
+
+exports.restrictTo = (...roles) => {
+    console.log(roles);
+    return (req, res, next) => {
+
+        if(!roles.includes(req.user.role)) {
+            return next(new AppError('You do not have permission to perform this action', 403));
+        }
+
+        next();
+    }
+}
+
+exports.forgotPassword = catchAsync(async(req, res, next) => {
+    // 1) Get email based on posted email address.
+    const user = await User.findOne({email: req.body.email});
+    if(!user) {
+        return next(new AppError('No user found with this email address', 404))
+    }
+    // 2) Generate the random reset token.
+    user.createPasswordResetToken();
+    await user.save();
+
+    res.status(200).json({
+        status: 'success',
+        user
+    })
+
+    // 3) Sent it to user's email.
+    // next();
 })
+
+exports.resetPassword = (req, res, next) => {}
